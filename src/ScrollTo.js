@@ -3,7 +3,13 @@ import PropTypes from 'prop-types';
 import { polyfill } from 'smoothscroll-polyfill'
 
 const _Anchor = (props, context) => {
-    return <div ref={ el => context.onRef(props.anchorId, el) }>{ props.children }</div>
+    return <div 
+                ref={ el => context.onRef({
+                    id: props.anchorId,
+                    behavior: props.behavior,
+                    block: props.block
+                }, el) }
+            >{ props.children }</div>
 }
 
 class ScrollToWrapper extends Component {
@@ -19,7 +25,8 @@ class ScrollToWrapper extends Component {
 
     componentDidUpdate (prevProps, prevState) {
         if(prevProps.to !== this.props.to) {
-            this.scrollToElement(this.props.to)
+            if(this.props.to)
+                this.scrollToElement(this.props.to)
         }
     }
 
@@ -37,20 +44,23 @@ class ScrollToWrapper extends Component {
         )
     }
 
-    handleAddRef = (id, el) => {
+    handleAddRef = (props, el) => {
         this.scrollToRefs = {
             ...this.scrollToRefs,
-            [id]: el
+            [props.id]: {
+                props,
+                el,
+            }
         }
     }
 
     scrollToElement(id) {
-        const el = this.scrollToRefs[id]
+        const { el, props } = this.scrollToRefs[id]
 
         if(!el) return;
         
-        el.scrollIntoView({ behavior: 'smooth' })
-        this.props.onScrollFinished(id, el)
+        el.scrollIntoView(props)
+        this.props.onScrollFinished()
     }
 }
 
@@ -58,8 +68,15 @@ _Anchor.contextTypes = {
     onRef: PropTypes.func
 };
 
+_Anchor.defaultProps = {
+    behavior: 'smooth',
+    block: 'start'
+}
+
 _Anchor.propTypes = {
     anchorId: PropTypes.string.isRequired,
+    behavior: PropTypes.oneOf(['auto', 'instant', 'smooth']),
+    block: PropTypes.oneOf(['start', 'end']),
 }
 
 ScrollToWrapper.defaultProps = {

@@ -24,14 +24,14 @@ class App extends Component {
                     </div>
                 </Anchor> 
 
-                <Anchor anchorId="bar">
+                <Anchor anchorId="bar" block="end">
                     <div style={{height: 500}}>
                         <h2>Bar</h2>
                     </div>
                 </Anchor> 
 
                 <div style={{height: 500}}>
-                    <Anchor anchorId="baz">
+                    <Anchor anchorId="baz" behavior="instant">
                         <h2>Baz</h2>
                     </Anchor>
                 </div>
