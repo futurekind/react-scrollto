@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { polyfill } from 'smoothscroll-polyfill'
 
-const _Anchor = props => {
-    return <div ref={ el => props.onRef(props.anchorId, el) }>{ props.children }</div>
+const _Anchor = (props, context) => {
+    return <div ref={ el => context.onRef(props.anchorId, el) }>{ props.children }</div>
 }
 
 class ScrollToWrapper extends Component {
@@ -22,15 +22,17 @@ class ScrollToWrapper extends Component {
             this.scrollToElement(this.props.to)
         }
     }
+
+    getChildContext() {
+        return {
+            onRef: this.handleAddRef
+        }
+    }
     
     render () {
         return (
             <div>
-                { React.Children.map(this.props.children, child => {
-                    if(child.props.anchorId)
-                        return <child.type onRef={ this.handleAddRef } {...child.props}  />
-                    return child
-                }) }
+                { this.props.children }
             </div>
         )
     }
@@ -52,6 +54,10 @@ class ScrollToWrapper extends Component {
     }
 }
 
+_Anchor.contextTypes = {
+    onRef: PropTypes.func
+};
+
 _Anchor.propTypes = {
     anchorId: PropTypes.string.isRequired,
 }
@@ -64,6 +70,10 @@ ScrollToWrapper.propTypes = {
     to: PropTypes.string,
     onScrollFinished: PropTypes.func,
 }
+
+ScrollToWrapper.childContextTypes = {
+    onRef: PropTypes.func
+};
 
 export const Anchor = _Anchor
 export default ScrollToWrapper
